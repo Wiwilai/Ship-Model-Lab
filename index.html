@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>船模實驗室｜Ship Model Laboratory</title>
+  <meta name="description" content="國立臺灣大學工程科學及海洋工程學系船模實驗室，專注大型拖曳水槽、船模試驗、推進系統、PMM、POW、POD 與 Qualisys 動態量測。" />
+  <style>
+    :root {
+      --navy: #082b4f;
+      --deep: #041626;
+      --blue: #0c6aa6;
+      --cyan: #62d6ff;
+      --gold: #d8a84f;
+      --light: #f3f7fb;
+      --ink: #102033;
+      --muted: #5d6b7a;
+      --white: #ffffff;
+      --shadow: 0 22px 60px rgba(4, 22, 38, 0.18);
+      --radius: 28px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Microsoft JhengHei", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--light);
+      line-height: 1.75;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+    .navbar {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 50;
+      padding: 18px 7vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--white);
+      background: linear-gradient(180deg, rgba(4, 22, 38, 0.92), rgba(4, 22, 38, 0));
+      transition: 0.25s ease;
+    }
+    .navbar.scrolled {
+      background: rgba(4, 22, 38, 0.92);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
+    .brand { font-weight: 900; letter-spacing: 0.08em; }
+    .navlinks { display: flex; gap: 22px; font-size: 0.94rem; }
+    .navlinks a { opacity: 0.9; }
+    .navlinks a:hover { color: var(--cyan); opacity: 1; }
+    .menu-btn { display: none; border: 0; color: #fff; background: rgba(255,255,255,.12); padding: 10px 12px; border-radius: 12px; font-weight: 900; }
+
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      color: var(--white);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 120px 7vw 88px;
+      background: linear-gradient(105deg, rgba(4, 22, 38, 0.86), rgba(4, 22, 38, 0.4)), url("towing tank.jpeg") center/cover no-repeat;
+    }
+    .hero-video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.72;
+      filter: saturate(1.05) contrast(1.05);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(105deg, rgba(4, 22, 38, 0.9) 0%, rgba(4, 22, 38, 0.62) 48%, rgba(4, 22, 38, 0.26) 100%),
+        radial-gradient(circle at 80% 25%, rgba(98, 214, 255, 0.26), transparent 34%);
+      z-index: 1;
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 960px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      font-size: 0.95rem;
+      margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-size: clamp(3rem, 7vw, 7rem);
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      margin-bottom: 24px;
+    }
+    .hero p {
+      max-width: 820px;
+      font-size: clamp(1.08rem, 2vw, 1.45rem);
+      color: rgba(255,255,255,0.88);
+      margin-bottom: 34px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-weight: 800;
+      transition: transform .2s ease, box-shadow .2s ease;
+      cursor: pointer;
+      border: 0;
+    }
+    .btn-primary { background: var(--cyan); color: var(--deep); }
+    .btn-outline { color: var(--white); border: 1px solid rgba(255,255,255,0.38); background: rgba(255,255,255,0.08); }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 16px 35px rgba(0,0,0,.22); }
+
+    section { padding: 96px 7vw; }
+    .section-head { max-width: 920px; margin-bottom: 44px; }
+    .tag { display: inline-block; color: var(--blue); font-weight: 900; letter-spacing: 0.14em; text-transform: uppercase; font-size: .82rem; margin-bottom: 10px; }
+    .section-head h2 { font-size: clamp(2.05rem, 4vw, 3.6rem); line-height: 1.15; letter-spacing: -0.035em; margin-bottom: 15px; }
+    .section-head p { color: var(--muted); font-size: 1.08rem; }
+
+    .stats {
+      position: relative;
+      z-index: 3;
+      margin: -62px 7vw 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      transition: .25s ease;
+    }
+    .stat-card:hover { transform: translateY(-6px); }
+    .stat-card strong { display: block; font-size: 1.75rem; color: var(--navy); line-height: 1.1; }
+    .stat-card span { color: var(--muted); font-weight: 700; font-size: .95rem; }
+
+    .grid-2 { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 40px; align-items: center; }
+    .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .pi-photo { height: 560px; background: #fff; }
+    .pi-photo img { object-fit: contain; background: #fff; padding: 10px; }
+    .pi-info { padding: 42px; }
+    .pi-info h3 { font-size: 2.1rem; line-height: 1.2; margin-bottom: 6px; }
+    .pi-title { color: var(--blue); font-weight: 900; margin-bottom: 22px; }
+    .contact-list { display: grid; gap: 10px; margin: 24px 0; color: var(--muted); }
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .chip { padding: 8px 13px; border-radius: 999px; background: #eaf5ff; color: var(--navy); font-size: .92rem; font-weight: 800; }
+
+    .dark { background: var(--deep); color: var(--white); }
+    .dark .section-head p { color: rgba(255,255,255,.74); }
+    .dark .tag { color: var(--cyan); }
+    .facility-layout { display: grid; grid-template-columns: 1.16fr .84fr; gap: 32px; align-items: stretch; }
+    .facility-image { min-height: 560px; border-radius: var(--radius); overflow: hidden; box-shadow: 0 26px 65px rgba(0,0,0,.32); }
+    .facility-panel {
+      padding: 36px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(10px);
+    }
+    .facility-panel h3 { font-size: 1.65rem; line-height: 1.3; margin-bottom: 14px; }
+    .feature-list { display: grid; gap: 16px; margin-top: 26px; }
+    .feature { padding: 18px; border-radius: 18px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); }
+    .feature strong { display: block; color: var(--cyan); margin-bottom: 4px; }
+
+    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin: -20px 0 34px; }
+    .filter-btn {
+      border: 1px solid rgba(8,43,79,.16);
+      background: #fff;
+      color: var(--navy);
+      padding: 10px 15px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--navy); color: #fff; }
+
+    .experiment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .experiment-card { border-radius: var(--radius); overflow: hidden; background: var(--white); box-shadow: var(--shadow); transition: .25s ease; }
+    .experiment-card:hover { transform: translateY(-8px); }
+    .experiment-card.hide { display: none; }
+    .experiment-card .photo { height: 260px; background: #dbe7ef; cursor: pointer; }
+    .experiment-card .content { padding: 24px; }
+    .experiment-card h3 { font-size: 1.25rem; margin-bottom: 8px; }
+    .experiment-card p { color: var(--muted); }
+
+    .research-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .research-card { padding: 26px; border-radius: 24px; background: var(--white); box-shadow: var(--shadow); min-height: 225px; color: var(--ink); transition: .25s ease; }
+    .research-card:hover { transform: translateY(-6px); }
+    .research-card span { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 14px; background: #eaf5ff; color: var(--blue); font-weight: 900; margin-bottom: 18px; }
+    .research-card h3 { font-size: 1.22rem; margin-bottom: 10px; }
+    .research-card p { color: var(--muted); font-size: .98rem; }
+
+    .outreach { background: #eaf1f7; }
+    .outreach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .outreach-card { position: relative; min-height: 360px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); cursor: pointer; }
+    .outreach-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(4,22,38,.76)); }
+    .outreach-card .caption { position: absolute; z-index: 2; left: 22px; right: 22px; bottom: 20px; color: #fff; }
+    .outreach-card h3 { font-size: 1.45rem; margin-bottom: 4px; }
+
+    .gallery-grid { display: grid; grid-template-columns: 1.18fr .82fr .82fr; grid-auto-rows: 250px; gap: 18px; }
+    .gallery-item { position: relative; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); background: #d7e4ef; cursor: pointer; }
+    .gallery-item.large { grid-row: span 2; }
+    .gallery-item.wide { grid-column: span 2; }
+    .gallery-caption { position: absolute; left: 16px; right: 16px; bottom: 16px; padding: 12px 14px; border-radius: 16px; background: rgba(4,22,38,.72); color: var(--white); backdrop-filter: blur(8px); font-weight: 800; }
+
+    .cta { background: linear-gradient(135deg, var(--navy), var(--deep)); color: var(--white); text-align: center; }
+    .cta h2 { font-size: clamp(2rem, 4vw, 3.6rem); line-height: 1.15; margin-bottom: 18px; }
+    .cta p { color: rgba(255,255,255,.78); max-width: 780px; margin: 0 auto 30px; }
+    footer { padding: 30px 7vw; background: #020d18; color: rgba(255,255,255,.64); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; font-size: .92rem; }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      background: rgba(0,0,0,.82);
+    }
+    .lightbox.show { display: flex; }
+    .lightbox img { max-width: min(1100px, 92vw); max-height: 82vh; width: auto; height: auto; border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+    .lightbox button { position: absolute; top: 22px; right: 28px; font-size: 2rem; color: #fff; background: transparent; border: 0; cursor: pointer; }
+    .back-top { position: fixed; right: 22px; bottom: 22px; z-index: 40; width: 46px; height: 46px; border-radius: 999px; border: 0; background: var(--navy); color: #fff; font-weight: 900; box-shadow: var(--shadow); cursor: pointer; display: none; }
+    .back-top.show { display: block; }
+
+    @media (max-width: 1050px) {
+      .menu-btn { display: block; }
+      .navlinks { position: absolute; top: 64px; left: 6vw; right: 6vw; display: none; flex-direction: column; gap: 0; border-radius: 18px; overflow: hidden; background: rgba(4,22,38,.96); box-shadow: var(--shadow); }
+      .navlinks.open { display: flex; }
+      .navlinks a { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,.08); }
+      .stats, .research-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .facility-layout, .outreach-grid { grid-template-columns: 1fr; }
+      .experiment-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 680px) {
+      section { padding: 72px 6vw; }
+      .hero { padding: 110px 6vw 76px; }
+      .stats, .experiment-grid, .research-grid, .gallery-grid { grid-template-columns: 1fr; }
+      .stats { margin: -42px 6vw 0; }
+      .gallery-grid { grid-auto-rows: 250px; }
+      .gallery-item.large, .gallery-item.wide { grid-row: span 1; grid-column: span 1; }
+      .pi-photo, .facility-image { height: auto; min-height: 380px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <div class="brand">SHIP MODEL LAB</div>
+    <button class="menu-btn" id="menuBtn" type="button">MENU</button>
+    <div class="navlinks" id="navlinks">
+      <a href="#about">首頁</a>
+      <a href="#pi">負責人</a>
+      <a href="#facility">大型水槽</a>
+      <a href="#experiments">實驗設備</a>
+      <a href="#research">研究方向</a>
+      <a href="#outreach">教學推廣</a>
+      <a href="#life">團隊生活</a>
+      <a href="#contact">聯絡我們</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="about">
+    <video class="hero-video" autoplay muted loop playsinline poster="towing tank.jpeg">
+      <source src="hero-video.mp4" type="video/mp4" />
+      <source src="拖帶影片.mov" type="video/quicktime" />
+    </video>
+    <div class="hero-content reveal">
+      <div class="eyebrow">國立臺灣大學｜工程科學及海洋工程學系</div>
+      <h1>船模實驗室</h1>
+      <p>以大型拖曳水槽為核心，結合拖車系統、船模實驗、推進器量測與動態追蹤技術，探索船舶與海洋工程系統的水動力性能。</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#experiments">查看實驗項目</a>
+        <a class="btn btn-outline" href="#facility">認識大型水槽</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="stats reveal">
+    <div class="stat-card"><strong>Tank</strong><span>大型拖曳水槽試驗</span></div>
+    <div class="stat-card"><strong>PMM</strong><span>船體操縱運動量測</span></div>
+    <div class="stat-card"><strong>POW / POD</strong><span>推進器與吊艙系統</span></div>
+    <div class="stat-card"><strong>Qualisys</strong><span>運動追蹤與資料分析</span></div>
+  </div>
+
+  <section id="pi" class="reveal">
+    <div class="section-head">
+      <span class="tag">Principal Investigator</span>
+      <h2>實驗室負責人</h2>
+      <p>透過實驗量測、數值模擬與工程設計，建立船舶水動力與海洋工程系統之完整研究能力。</p>
+    </div>
+    <div class="grid-2">
+      <div class="card pi-photo"><img src="教授照片.png" alt="林宗岳助理教授照片" /></div>
+      <div class="card pi-info">
+        <h3>林宗岳 助理教授</h3>
+        <div class="pi-title">國立臺灣大學博士</div>
+        <p>本實驗室聚焦於船舶水動力、幾何造型、船舶設計、計算流體力學與船模試驗。研究團隊以大型拖曳水槽為主要實驗平台，量測船體、推進器與海洋結構物在不同操作條件下的受力與運動反應。</p>
+        <div class="contact-list">
+          <div>📍 工海 211 室</div>
+          <div>☎ 02-3366-5751</div>
+          <div>✉ tylin110@ntu.edu.tw</div>
+        </div>
+        <div class="chips">
+          <span class="chip">船舶水動力</span><span class="chip">船模試驗</span><span class="chip">推進系統</span><span class="chip">計算流體力學</span><span class="chip">船舶設計</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dark reveal" id="facility">
+    <div class="section-head">
+      <span class="tag">Research Facility</span>
+      <h2>大型拖曳水槽與拖車系統</h2>
+      <p>我們的主要研究場域為大型拖曳水槽，透過可控制的試驗速度、模型安裝與量測系統，建立可重複且可驗證的水動力實驗流程。</p>
+    </div>
+    <div class="facility-layout">
+      <div class="facility-image lightbox-source"><img src="towing tank.jpeg" alt="大型拖曳水槽" /></div>
+      <div class="facility-panel">
+        <h3>以實驗觀察船體與推進器在水中的真實行為</h3>
+        <p>拖曳水槽可模擬船舶前進時的相對流場，搭配船模、螺槳、POD 與運動追蹤設備，量測阻力、推進性能、操縱力與姿態變化。</p>
+        <div class="feature-list">
+          <div class="feature"><strong>拖曳車系統</strong>提供穩定且可控制的試驗速度，作為船模與流場相對運動的基準。</div>
+          <div class="feature"><strong>模型安裝與量測</strong>可依研究需求配置船體、PMM、POW、POD 與相關感測器。</div>
+          <div class="feature"><strong>水動力資料分析</strong>整合受力、力矩、運動軌跡與影像紀錄，回推船舶性能與設計改善方向。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experiments" class="reveal">
+    <div class="section-head">
+      <span class="tag">Experimental Platforms</span>
+      <h2>實驗設備與量測能力</h2>
+      <p>本實驗室的特色在於「以實驗為核心」：從船體操縱、推進器開放水試驗到運動追蹤，皆可在水槽中進行系統性驗證。</p>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">全部</button>
+      <button class="filter-btn" data-filter="tank">水槽</button>
+      <button class="filter-btn" data-filter="propulsion">推進器</button>
+      <button class="filter-btn" data-filter="tracking">量測追蹤</button>
+      <button class="filter-btn" data-filter="outreach">教學展示</button>
+    </div>
+    <div class="experiment-grid">
+      <article class="experiment-card" data-category="tank"><div class="photo lightbox-source"><img src="PMM.jpeg" alt="PMM 船體操縱試驗" /></div><div class="content"><h3>PMM 船體操縱試驗</h3><p>透過平面運動機構控制船模運動，用於分析操縱性、橫向力與艏搖力矩等水動力係數。</p></div></article>
+      <article class="experiment-card" data-category="propulsion"><div class="photo lightbox-source"><img src="pow.png" alt="POW 螺槳試驗" /></div><div class="content"><h3>POW 螺槳開放水試驗</h3><p>量測螺槳推力與扭矩，建立推力係數、扭矩係數與開放水效率等基礎性能曲線。</p></div></article>
+      <article class="experiment-card" data-category="propulsion"><div class="photo lightbox-source"><img src="pod.png" alt="POD 吊艙推進器" /></div><div class="content"><h3>POD 吊艙推進系統</h3><p>研究吊艙式推進器在不同方位角與操作條件下的推進效率、側向力與操縱能力。</p></div></article>
+      <article class="experiment-card" data-category="tracking"><div class="photo lightbox-source"><img src="qualysis.jpeg" alt="Qualisys 運動追蹤" /></div><div class="content"><h3>Qualisys 運動追蹤</h3><p>以光學追蹤系統記錄模型運動，輔助分析船體姿態、軌跡與動態反應。</p></div></article>
+      <article class="experiment-card" data-category="tank"><div class="photo lightbox-source"><img src="水槽合照.jpeg" alt="水槽試驗團隊" /></div><div class="content"><h3>團隊化水槽試驗</h3><p>由研究生與教師共同完成模型安裝、儀器校正、試驗操作與資料整理。</p></div></article>
+      <article class="experiment-card" data-category="outreach"><div class="photo lightbox-source"><img src="營隊介紹3.jpeg" alt="實驗展示與介紹" /></div><div class="content"><h3>實驗展示與教育推廣</h3><p>透過現場展示與解說，讓學生理解船舶工程、流體力學與模型試驗的實際應用。</p></div></article>
+    </div>
+  </section>
+
+  <section class="dark reveal" id="research">
+    <div class="section-head">
+      <span class="tag">Research Topics</span>
+      <h2>核心研究方向</h2>
+      <p>以水槽試驗為基礎，結合理論模型與計算流體力學，發展船舶與海洋工程系統之性能評估方法。</p>
+    </div>
+    <div class="research-grid">
+      <div class="research-card"><span>01</span><h3>船舶水動力</h3><p>研究船體在不同速度、姿態與操作條件下的阻力、受力與流場行為。</p></div>
+      <div class="research-card"><span>02</span><h3>操縱與耐海性</h3><p>分析船體運動、操縱力與波浪中反應，支援船舶安全與性能設計。</p></div>
+      <div class="research-card"><span>03</span><h3>推進系統</h3><p>探討螺槳、POD、對轉推進器與船體間的交互作用與效率表現。</p></div>
+      <div class="research-card"><span>04</span><h3>CFD 與資料分析</h3><p>整合數值模擬與實驗數據，提高流體力學預測與設計判讀的可靠度。</p></div>
+    </div>
+  </section>
+
+  <section class="outreach reveal" id="outreach">
+    <div class="section-head">
+      <span class="tag">Education & Outreach</span>
+      <h2>教學、營隊與實驗展示</h2>
+      <p>除了研究工作，實驗室也透過營隊與參訪活動，讓更多學生接觸船舶工程與水槽實驗。</p>
+    </div>
+    <div class="outreach-grid">
+      <div class="outreach-card lightbox-source"><img src="營隊介紹.png" alt="營隊介紹" /><div class="caption"><h3>水槽現場導覽</h3><p>介紹拖曳水槽、模型安裝與試驗流程。</p></div></div>
+      <div class="outreach-card lightbox-source"><img src="營隊介紹2.jpeg" alt="營隊實驗展示" /><div class="caption"><h3>實驗示範與討論</h3><p>將抽象的流體力學概念轉化為可觀察的實驗現象。</p></div></div>
+    </div>
+  </section>
+
+  <section id="life" class="reveal">
+    <div class="section-head">
+      <span class="tag">Laboratory Life</span>
+      <h2>團隊生活與研究日常</h2>
+      <p>嚴謹的試驗之外，團隊也透過聚餐、討論與共同活動，建立良好的合作默契。</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item large lightbox-source"><img src="水槽合照.jpeg" alt="水槽前合照" /><div class="gallery-caption">水槽試驗團隊合影</div></div>
+      <div class="gallery-item lightbox-source"><img src="聚餐1.jpeg" alt="實驗室聚餐" /><div class="gallery-caption">實驗室聚餐</div></div>
+      <div class="gallery-item lightbox-source"><img src="聚餐2.jpeg" alt="團隊聚餐" /><div class="gallery-caption">研究之外的交流</div></div>
+      <div class="gallery-item wide lightbox-source"><img src="IMG_3646.jpeg" alt="畢業紀念拍貼" /><div class="gallery-caption">畢業與團隊回憶</div></div>
+      <div class="gallery-item lightbox-source"><img src="營隊介紹3.jpeg" alt="營隊介紹" /><div class="gallery-caption">教學推廣活動</div></div>
+      <div class="gallery-item lightbox-source"><img src="IMG_3497.jpeg" alt="餐廳聚會" /><div class="gallery-caption">團隊聚會</div></div>
+    </div>
+  </section>
+
+  <section class="cta reveal" id="contact">
+    <h2>加入我們，一起探索船舶與海洋工程的未來</h2>
+    <p>歡迎對船舶水動力、船模試驗、推進系統、計算流體力學與海洋工程研究有興趣的同學與合作夥伴聯繫我們。</p>
+    <a class="btn btn-primary" href="mailto:tylin110@ntu.edu.tw">聯絡實驗室</a>
+  </section>
+
+  <footer>
+    <div>© 2026 Ship Model Laboratory, National Taiwan University</div>
+    <div>Department of Engineering Science and Ocean Engineering</div>
+  </footer>
+
+  <div class="lightbox" id="lightbox">
+    <button type="button" id="lightboxClose" aria-label="Close">×</button>
+    <img id="lightboxImg" alt="preview" />
+  </div>
+  <button class="back-top" id="backTop" type="button">↑</button>
+
+  <script>
+    const navbar = document.getElementById('navbar');
+    const backTop = document.getElementById('backTop');
+    const menuBtn = document.getElementById('menuBtn');
+    const navlinks = document.getElementById('navlinks');
+
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+      backTop.classList.toggle('show', window.scrollY > 500);
+    });
+
+    menuBtn.addEventListener('click', () => navlinks.classList.toggle('open'));
+    navlinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navlinks.classList.remove('open'));
+    });
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const experimentCards = document.querySelectorAll('.experiment-card');
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        experimentCards.forEach(card => {
+          const show = filter === 'all' || card.dataset.category === filter;
+          card.classList.toggle('hide', !show);
+        });
+      });
+    });
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+    document.querySelectorAll('.lightbox-source img').forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.getAttribute('src');
+        lightboxImg.alt = img.getAttribute('alt') || 'preview';
+        lightbox.classList.add('show');
+      });
+    });
+    lightboxClose.addEventListener('click', () => lightbox.classList.remove('show'));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('show'); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('show'); });
+
+    document.querySelectorAll('img').forEach(img => {
+      img.addEventListener('error', () => {
+        img.style.objectFit = 'contain';
+        img.style.padding = '22px';
+        img.style.background = '#dfeaf2';
+        img.alt = '圖片檔名或路徑需要確認：' + img.getAttribute('src');
+      });
+    });
+  </script>
+</body>
+</html>
