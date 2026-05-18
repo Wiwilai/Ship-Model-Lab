@@ -1112,6 +1112,32 @@
     /* =======================
        CTA, footer, utilities
     ======================= */
+    .carousel-btn {
+  position: absolute;
+  top: 50%;
+  z-index: 20;
+  transform: translateY(-50%);
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(2, 11, 20, .72);
+  color: #fff;
+  font-size: 2.4rem;
+  cursor: pointer;
+}
+
+.carousel-btn.prev {
+  left: 24px;
+}
+
+.carousel-btn.next {
+  right: 24px;
+}
+
+.carousel-btn:hover {
+  background: var(--blue);
+}
 
     .cta {
       background: linear-gradient(135deg, var(--navy), var(--deep));
@@ -1282,12 +1308,6 @@
 
       .life-slide {
         height: 420px;
-      }
-
-      .carousel-btn {
-        width: 42px;
-        height: 42px;
-        font-size: 1.5rem;
       }
 
       .video-toggle {
@@ -2257,11 +2277,6 @@ lifeCarousel.addEventListener(
   stopLifeAutoplay
 );
 
-lifeCarousel.addEventListener(
-  'mouseleave',
-  startLifeAutoplay
-);
-
 /* Touch Swipe */
 
 let touchStartX = 0;
@@ -2297,27 +2312,46 @@ lifeCarousel.addEventListener(
   }
 );
 
+/* Mouse Drag Swipe */
+
+let mouseStartX = 0;
+let mouseEndX = 0;
+let isDraggingLife = false;
+
+lifeCarousel.addEventListener('mousedown', e => {
+  isDraggingLife = true;
+  mouseStartX = e.clientX;
+  stopLifeAutoplay();
+});
+
+lifeCarousel.addEventListener('mouseup', e => {
+  if (!isDraggingLife) return;
+
+  mouseEndX = e.clientX;
+  isDraggingLife = false;
+
+  if (mouseEndX < mouseStartX - 50) {
+    nextLifeSlide();
+  }
+
+  if (mouseEndX > mouseStartX + 50) {
+    prevLifeSlide();
+  }
+
+  restartLifeAutoplay();
+});
+
+lifeCarousel.addEventListener('mouseleave', () => {
+  isDraggingLife = false;
+restartLifeAutoplay();
+});
+    
 /* Init */
 
 showLifeSlide(0);
 startLifeAutoplay();
     
 
-    lifeNext.addEventListener('click', () => {
-      nextLifeSlide();
-      restartLifeAutoplay();
-    });
-
-    lifePrev.addEventListener('click', () => {
-      prevLifeSlide();
-      restartLifeAutoplay();
-    });
-
-    lifeCarousel.addEventListener('mouseenter', stopLifeAutoplay);
-    lifeCarousel.addEventListener('mouseleave', startLifeAutoplay);
-
-    showLifeSlide(0);
-    startLifeAutoplay();
 
     document.querySelectorAll('img').forEach(img => {
       img.addEventListener('error', () => {
